@@ -24,6 +24,10 @@ colnames(taxa)[1]<-c("query")
 simcutoff=as.numeric(args[5])
 lencutoff=as.numeric(args[6])
 
+barcode=fread(args[9],header=F)
+colnames(barcode)<-c("barcode","query","length")
+barcode<-barcode[,1:2]
+
 ########################
 # SARG filtering
 ########################
@@ -104,12 +108,14 @@ arg.f<-arg.filter(arg,
 )
 arg.f<-arg.f[,c("query","subtype","type","q.start","q.end")]
 
+# merge in barcode
+arg.f2<-merge(arg.f,barcode, by="query", all.x=T)
 
 # get ARG profile of nanopore query with taxa classification
 # summary results in arg.summary
 if(nrow(arg.f)>0){
 	arg.w.taxa<-merge(arg.f,taxa,by="query",all.x=T)
-	#arg.w.taxa<-merge(arg.w.taxa,plasmid,by="query",all.x=T)
+	
 	arg.w.taxa[is.na(arg.w.taxa)]<-""
 	arg.c<-aggregate( query~subtype+type,arg.w.taxa,length)
 	# arg.c$copy.per.cell<-arg.c$query/NO.c
@@ -117,7 +123,9 @@ if(nrow(arg.f)>0){
 	
 	# --  write out ----
 	write.table(arg.w.taxa,file=args[7], quote=F,row.names = F,sep="\t")
-	write.table(arg.c,file=args[8], quote=F,row.names = F,sep="\t")
+	# write.table(arg.c,file=args[8], quote=F,row.names = F,sep="\t")
+	write.table(arg.f2,file=args[8], quote=F,row.names = F,sep="\t") # write out the arg annotation per read
+	
 } else { 
   cat("Warning: NO ARG identified\nOnly taxa annotations were generated \n")
   

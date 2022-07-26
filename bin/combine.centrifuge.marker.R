@@ -34,6 +34,11 @@ fasta.name$genus<-""
 fasta.name$species<-""
 fasta.name<-fasta.name[,c("contig","kingdom","phylum","class","order","family","genus","species")]
 
+barcode=fread(args[10],header=F)
+colnames(barcode)<-c("barcode","contig","length")
+barcode<-barcode[,1:2]
+
+
 # --- taxa voting for centrifuge taxa : cen2---------
 cat("taxa voting for centrifuge result\n")
 
@@ -186,7 +191,7 @@ merge.taxa<-function(k,t){
 m<-merge.taxa(data.frame(cen2),data.frame(taxa))
 
 m<-rbind(m,fasta.name[which(!fasta.name$contig %in% m$contig),])
-
+m<-merge(m, barcode, by="contig", all.x=T)
 
 write.table(m,file=args[9],row.name=F,col.name=T, quote=F, sep="\t")
 

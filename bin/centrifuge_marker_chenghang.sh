@@ -7,6 +7,7 @@ DIR=$3
 Simcutoff=$4
 Lencuoff=$5
 nowt=$6
+barcode=$7
 
 ##### taxonomy annotation based on Centrifuge #################
 Query=$1
@@ -86,6 +87,7 @@ Rscript ${DIR}/bin/combine.centrifuge.marker.R \
 	$DIR/database/taxa.info.RData \
 	$Simcutoff \
 	$Lencuoff  \
-	${Query}_taxa.tab
+	${Query}_taxa.tab \
+	${barcode}
 
 rm -f ${Query}.l
